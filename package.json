@@ -1,0 +1,14 @@
+{
+  "name": "discogsscraper",
+  "version": "1.0.0",
+  "description": "Given a list of artists, fetch the images for them from Discogs and save them",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ben Wilcox <reccanti@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "disconnect": "^0.8.0"
+  }
+}
