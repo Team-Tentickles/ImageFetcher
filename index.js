@@ -1,24 +1,50 @@
-// var Discogs = require('disconnect').Client;
-// var dis = new Discogs({userToken: 'xQSstXxQtGrcxUDRGSHJYjshQcuqYgbsBQlMKagH'});
-// var db = dis.database();
-
-// var fs = require('fs');
-
-
-// var findPhoto = function(data, callback){
-// 	db.search(data, {'type': 'artist'}, function(err, data){
-// 		db.getArtist(data.results[0].id, function(err, data2) {
-// 		   if(err){
-//                 console.error("failed to find photo");
-// 			    console.log(err);
-//                 // callback(err, "");
-// 			}
-// 			else{
-//                 console.log(data2.images);
-// 				// callback(null, data2.images[0].resource_url);
-// 			}
-// 		}); 
-// 	});
-// };
 var photofetcher = require('./photofetcher');
-photofetcher.findPhoto("Elvis Presley");
+var getartists = require('./getartists');
+var managedownloads = require('./managedownloads');
+var artistNames = getartists.getArtists();
+var path = require('path');
+
+var downloadImageOnTimer = function (url, filename, timer) {
+    setTimeout(function () {
+        downloadimages.downloadImage(url, filename, function () {
+            console.log('downloaded to ' + filename);
+        });
+    }, timer);
+}
+
+var populateFolderWithImages = function (artist, folder) {
+    photofetcher.findPhoto(artist, function (err, urls) {
+        if (err === null) {
+            for (var i = 0; i < urls.length; i++) {
+                var url = urls[i];
+                var filename = folder + '/' + artist + i + '.jpg';    
+                filename = filename.replace(/[\?<>\\:\*\|":]/g, ''); // remove illegal chars
+                filename = filename.replace(/ /g, '_');
+                photofetcher.downloadImage(url, filename);
+            }
+        } else {
+            console.error(err);
+            throw err;
+        }
+    });
+}
+
+var createArtistFolder = function (root, artistName) {
+    var dir = root + "/" +  artistName;
+    managedownloads.mkArtistDirectory(dir, function (formattedDir) {
+        populateFolderWithImages(artistName, formattedDir);
+    });
+};
+
+var createArtistFolderTimeout = function (time, root, artistName) {
+    setTimeout(function () {
+        createArtistFolder(root, artistName);
+    }, time);
+};
+
+var downloadFolder = path.resolve(__dirname, './download');
+managedownloads.clearDownloads(downloadFolder, function (root) {
+    for (var i = 0; i < artistNames.length; i++) {
+        createArtistFolderTimeout(i * 1100, downloadFolder, artistNames[i]);
+    }   
+});

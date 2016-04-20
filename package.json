@@ -9,6 +9,9 @@
   "author": "Ben Wilcox <reccanti@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "disconnect": "^0.8.0"
+    "disconnect": "^0.8.0",
+    "request": "^2.72.0",
+    "rimraf": "^2.5.2",
+    "sanitize-filename": "^1.5.3"
   }
 }
